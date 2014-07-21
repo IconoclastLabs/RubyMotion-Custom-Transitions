@@ -1,4 +1,4 @@
-class MainController < UIViewController 
+class MainController < UIViewController
 
   def viewDidLoad
     super
@@ -15,22 +15,16 @@ class MainController < UIViewController
   end
 
   def init_nav
-    self.title = 'Title Here'
+    self.title = 'Controller Animations'
 
-    self.navigationItem.tap do |nav|
-      nav.leftBarButtonItem = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAction,
-                                                                           target: self, action: :nav_left_button)
-      nav.rightBarButtonItem = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemRefresh,
-                                                                           target: self, action: :nav_right_button)
+    rmq.append(UIButton, :load_normal).on(:tap) do |sender|
+      p "Normal Clicked"
     end
-  end
 
-  def nav_left_button
-    puts 'Left button'
-  end
 
-  def nav_right_button
-    puts 'Right button'
+    rmq.append(UIButton, :load_special).on(:tap) do |sender|
+      p "Special Clicked"
+    end
   end
 
   # Remove if you are only supporting portrait
@@ -45,20 +39,5 @@ class MainController < UIViewController
 
 end
 
-
-__END__
-
-# You don't have to reapply styles to all UIViews, if you want to optimize, 
-# another way to do it is tag the views you need to restyle in your stylesheet, 
-# then only reapply the tagged views, like so:
-def logo(st)
-  st.frame = {t: 10, w: 200, h: 96}
-  st.centered = :horizontal
-  st.image = image.resource('logo')
-  st.tag(:reapply_style)
-end
-
-# Then in willAnimateRotationToInterfaceOrientation
-rmq(:reapply_style).reapply_styles
 
 
