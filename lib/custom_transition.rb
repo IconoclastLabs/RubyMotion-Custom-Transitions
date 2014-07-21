@@ -1,8 +1,6 @@
 class CustomTransition
-  attr_accessor :from_vc, :to_vc
-  PADDING = 1.5
 
-  def initialize (duration = 0.5)
+  def initialize (duration = 1.0)
     @duration = duration
   end
 
@@ -11,53 +9,56 @@ class CustomTransition
     @duration
   end
 
-  # Required by iOS7 UIViewControllerAnimatedTransitioning
   def animateTransition transitionContext
 
-    # Customization
-    from_options = {
-      duration: @duration,
+    #Animate existing layer away + remove
+    rmq(@from_vc.view).animate(
+      duration: @duration/2,
+      animations: ->(cq) {
+        cq.style do |st|
+          st.opacity = 0
+          st.rotation = 180
+        end
+      },
       completion: -> (did_finish, q) {
-        # get outa hea!
+        # clear on out
         @from_vc.view.removeFromSuperview
       }
-    }
+    )
 
-    # Using RMQ canned animation
-    rmq(@from_vc).drop_and_spin(from_options)
+    # First add our new subview
+    transitionContext.containerView.addSubview(@to_vc.view)
+    #start it off
+    rmq(@to_vc.view).style do |st|
+      st.opacity = 0.1
+      st.scale = 8.0
+    end
 
-    # Customization
-    to_options = {
+    # Animate new view into place + completeTransition
+    rmq(@to_vc.view).animate(
       duration: @duration,
+      animations: ->(cq) {
+        cq.style do |st|
+          st.opacity = 1.0
+          st.scale = 1.0
+        end
+      },
       completion: -> (did_finish, q) {
+        #relinquish animation state
         transitionContext.completeTransition(true)
       }
-    }
+    )
 
-    # Add new controller
-    transitionContext.containerView.addSubview(@to_vc.view)
-
-    # Animate in with RQM canned animation
-    rmq(@to_vc).land_and_sink_and_throb(to_options)
 
   end
 
   # Navigation controller delegate
   def navigationController(navigationController, animationControllerForOperation:operation, fromViewController:from_vc, toViewController:to_vc)
     @operation = operation
-    @from_vc = clear_background(from_vc)
-    @to_vc = clear_background(to_vc)
+    @from_vc = from_vc
+    @to_vc = to_vc
 
     self
   end
-
-
-  def clear_background(vc)
-    vc.view.backgroundColor = rmq.color.clear
-    vc.view.backgroundView = nil if vc.view.is_a?(UITableView)
-
-    vc
-  end
-
 
 end

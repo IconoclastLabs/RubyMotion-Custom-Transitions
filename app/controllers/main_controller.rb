@@ -19,11 +19,17 @@ class MainController < UIViewController
 
     rmq.append(UIButton, :load_normal).on(:tap) do |sender|
       p "Normal Clicked"
+      @step ||= UINavigationController.alloc.initWithRootViewController(Step1Controller.new)
+      self.presentViewController(@step, animated:true, completion:nil)
     end
 
 
     rmq.append(UIButton, :load_special).on(:tap) do |sender|
       p "Special Clicked"
+      @step ||= UINavigationController.alloc.initWithRootViewController(Step1Controller.new)
+      @transition = CustomTransition.new
+      @step.delegate = @transition
+      self.presentViewController(@step, animated:true, completion:nil)
     end
   end
 
